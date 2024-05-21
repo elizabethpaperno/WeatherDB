@@ -44,3 +44,9 @@ def update_tables(client, dict):
     #data, count = supabase.table('Date').insert({"date": dict.get("date")}).execute()
     #data, count = supabase.table('Location').insert({"location": dict.get("location")}).execute()
     data, count = client.table('weather').insert({"date": dict.get("date"), "location": dict.get("location"), "high": dict.get("high"), "low": dict.get("low")}).execute()
+
+if __name__ == "__main__":
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    for location_code in location_codes:
+        dict = scrape_weather_data(location_code)
+        update_table(supabase, dict)
