@@ -14,6 +14,7 @@ soup = BeautifulSoup(page.content, "html.parser")
 # print(soup)
 
 def scrape_weather_data(location_code):
+    dict = {}
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
     wx_data_div = soup.find('div', {'data-testid': 'wxData', 'class': 'WeatherDetailsListItem--wxData--kK35q'})
@@ -24,10 +25,22 @@ def scrape_weather_data(location_code):
 
     location = soup.find('h1', {'class': 'CurrentConditions--location--1YWj_'}).text
     
-    date = date.today()
+    curr_date = date.today()
+
+    dict["curr_date"] = date
+    dict["location"] = location
+    dict["high"] = high_temp
+    dict["low"] = low_temp
+
+    return dict
 
     # print extracted date, location, and high and low temp
     # print(f"Date: {date}")
     # print(f"Location: {location}")
     # print(f"High Temperature: {high_temp}")
     # print(f"Low Temperature: {low_temp}")
+
+def update_tables(client, dict):
+    #data, count = supabase.table('Date').insert({"date": dict.get("date")}).execute()
+    #data, count = supabase.table('Location').insert({"location": dict.get("location")}).execute()
+    data, count = client.table('weather').insert({"date": dict.get("date"), "location": dict.get("location"), "high": dict.get("high"), "low": dict.get("low")}).execute()
