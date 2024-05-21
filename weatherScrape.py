@@ -8,7 +8,7 @@ page = requests.get("https://weather.com/weather/today/l/USNY0002:1:US")
 soup = BeautifulSoup(page.content, "html.parser")
 # print(soup)
 
-for location_code in location_codes:
+def scrape_weather_data(location_code):
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
     wx_data_div = soup.find('div', {'data-testid': 'wxData', 'class': 'WeatherDetailsListItem--wxData--kK35q'})
