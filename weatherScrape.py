@@ -26,9 +26,9 @@ def scrape_weather_data(location_code):
 
     location = soup.find('h1', {'class': 'CurrentConditions--location--1YWj_'}).text
     
-    curr_date = datetime.now().strftime("%Y-%m-%d")
+    date = datetime.now().strftime("%Y-%m-%d")
 
-    dict["curr_date"] = curr_date
+    dict["date"] = date
     dict["location"] = location
     dict["high"] = format_temp(high_temp)
     dict["low"] = format_temp(low_temp)
@@ -51,7 +51,7 @@ def format_temp(unformatted_temp):
 
 def update_tables(client, dict):
     data, count = supabase.table('date').insert({"date": dict.get("date")}).execute()
-    data, count = supabase.table('location').insert({"location": dict.get("location")}).execute()
+    data, count = supabase.table('location').insert({"location_name": dict.get("location")}).execute()
     data, count = client.table('weather').insert({"date": dict.get("date"), "location": dict.get("location"), "high": dict.get("high"), "low": dict.get("low")}).execute()
 
 if __name__ == "__main__":
@@ -59,4 +59,4 @@ if __name__ == "__main__":
     count = 0
     for location_code in location_codes:
         dict = scrape_weather_data(location_code)
-        update_table(supabase, dict)
+        update_tables(supabase, dict)
