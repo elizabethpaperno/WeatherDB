@@ -1,5 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
+import os
+from supabase import create_client, Client
+
+SUPABASE_URL = "https://kdpfszinopwchmjvxdfl.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcGZzemlub3B3Y2htanZ4ZGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTYyNDM0OTgsImV4cCI6MjAzMTgxOTQ5OH0.H6fs_uUEeOHjscCpqwD3MSSvLeMvsfaO9vOlbo0EDsY"
 
 # 10 chosen location codes
 location_codes = {"USNY0002:1:US", "USFL0002:1:US", "USNJ0002:1:US", "USVT0002:1:US", "USMA0002:1:US", "USNH0002:1:US", "USVA0002:1:US", "USCA0002:1:US", "USCO0002:1:US", "USUT0002:1:US"}
@@ -22,7 +27,7 @@ def scrape_weather_data(location_code):
     date = date.today()
 
     # print extracted date, location, and high and low temp
-    print(f"Date: {date}")
-    print(f"Location: {location}")
-    print(f"High Temperature: {high_temp}")
-    print(f"Low Temperature: {low_temp}")
+    # print(f"Date: {date}")
+    # print(f"Location: {location}")
+    # print(f"High Temperature: {high_temp}")
+    # print(f"Low Temperature: {low_temp}")
