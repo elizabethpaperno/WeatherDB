@@ -49,15 +49,14 @@ def format_temp(unformatted_temp):
         formatted_temp = int(unformatted_temp[:-1])
     return formatted_temp
 
-def update_tables(count, client, dict):
-    #data, count = supabase.table('Date').insert({"date": dict.get("date")}).execute()
-    #data, count = supabase.table('Location').insert({"location": dict.get("location")}).execute()
-    data, count = client.table('weather').insert({"id": count,"date": dict.get("date"), "location": dict.get("location"), "high": dict.get("high"), "low": dict.get("low")}).execute()
+def update_tables(client, dict):
+    data, count = supabase.table('date').insert({"date": dict.get("date")}).execute()
+    data, count = supabase.table('location').insert({"location": dict.get("location")}).execute()
+    data, count = client.table('weather').insert({"date": dict.get("date"), "location": dict.get("location"), "high": dict.get("high"), "low": dict.get("low")}).execute()
 
 if __name__ == "__main__":
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     count = 0
     for location_code in location_codes:
         dict = scrape_weather_data(location_code)
-        update_table(count, supabase, dict)
-        count += 1; 
+        update_table(supabase, dict)
