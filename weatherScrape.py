@@ -4,6 +4,7 @@ import os
 from supabase import create_client, Client
 from datetime import datetime
 
+
 SUPABASE_URL = "https://kdpfszinopwchmjvxdfl.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcGZzemlub3B3Y2htanZ4ZGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTYyNDM0OTgsImV4cCI6MjAzMTgxOTQ5OH0.H6fs_uUEeOHjscCpqwD3MSSvLeMvsfaO9vOlbo0EDsY"
 
@@ -14,7 +15,7 @@ page = requests.get("https://weather.com/weather/today/l/USNY0002:1:US")
 soup = BeautifulSoup(page.content, "html.parser")
 # print(soup)
 
-def scrape_weather_data(location_code):
+def scrape_weather_data(client, location_code):
     dict = {}
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
@@ -28,12 +29,19 @@ def scrape_weather_data(location_code):
     
     date = datetime.now().strftime("%Y-%m-%d")
 
-    dict["date"] = date
-    dict["location"] = location
-    dict["high"] = format_temp(high_temp)
-    dict["low"] = format_temp(low_temp)
+    try:
+        update_date_table(client, date)
+    except: 
+        # means date has already been added, ignore error
+        pass  
 
-    return dict
+    try: 
+        update_location_table(client, location_code, location)  
+    except: 
+         # means location has already been added, ignore error
+        pass
+
+    update_weather_table(client, date, location_code, high_temp, low_temp)
 
     # print extracted date, location, and high and low temp
     # print(f"Date: {date}")
@@ -49,14 +57,17 @@ def format_temp(unformatted_temp):
         formatted_temp = int(unformatted_temp[:-1])
     return formatted_temp
 
-def update_weather_table(client, dict):
-    
-    data, count = client.table('weather').insert({"date": dict.get("date"), "location": dict.get("location"), "high": dict.get("high"), "low": dict.get("low")}).execute()
+def update_weather_table(client, date_id, location_code, high_temp, low_temp):
+    # data,count = client.from('date')
+    #     .select('date')
+    #     .eq(dict.get("date"))
+    #     .execute()
+    data, count = client.table('weather').insert({"date_id": date_id, "location_code": location_code, "high": high_temp, "low": low_temp}).execute()
 
-def update_location_table(client, dict): 
-    data, count = supabase.table('location').insert({"location_name": dict.get("location")}).execute()
+def update_location_table(client, location_code, location_name): 
+    data, count = supabase.table('location').insert({"id": dict.get("location_code"), "location_name": dict.get("location")}).execute()
 
-def update_date_table(client, dict): 
+def update_date_table(client, date): 
     data, count = supabase.table('date').insert({"date": dict.get("date")}).execute()
     
 
@@ -64,15 +75,4 @@ if __name__ == "__main__":
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     count = 0
     for location_code in location_codes:
-        dict = scrape_weather_data(location_code)
-        try: 
-            update_date_table(supabase, dict)
-        except: 
-           # means date has already been added, ignore error
-           pass 
-        try: 
-            update_location_table(supabase, dict)
-        except: 
-            # means location has already been added, ignore error
-            pass 
-        update_weather_table(supabase, dict)
+        scrape_weather_data(location_code)
