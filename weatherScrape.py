@@ -11,12 +11,7 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # 10 chosen location codes
 location_codes = {"USNY0002:1:US", "USFL0002:1:US", "USNJ0002:1:US", "USVT0002:1:US", "USMA0002:1:US", "USNH0002:1:US", "USVA0002:1:US", "USCA0002:1:US", "USCO0002:1:US", "USUT0002:1:US"}
 
-page = requests.get("https://weather.com/weather/today/l/USNY0002:1:US")
-soup = BeautifulSoup(page.content, "html.parser")
-# print(soup)
-
 def scrape_weather_data(client, location_code):
-    dict = {}
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
 
@@ -37,18 +32,18 @@ def scrape_weather_data(client, location_code):
     try:
         update_date_table(client, date)
     except: 
-        # means date has already been added, ignore error
+        # Means date has already been added, ignore error
         pass  
 
     try: 
         update_location_table(client, location_code, location)  
     except: 
-         # means location has already been added, ignore error
+         # Means location has already been added, ignore error
         pass
 
     update_weather_table(client, date, location_code, format_temp(high_temp), format_temp(low_temp))
 
-# functions that update each table
+# Functions that update each table
 def update_weather_table(client, date, location_code, high_temp, low_temp):
     date_id = get_date_id(client, date)
     response = client.table('weather_table').insert({"date_id": date_id, "location_code": location_code, "high": high_temp, "low": low_temp}).execute()
@@ -59,7 +54,7 @@ def update_location_table(client, location_code, location_name):
 def update_date_table(client, date): 
     data, count = client.table('date_table').insert({"date": date}).execute()
 
-# helper functions
+# Helper functions
 def get_date_id(client, date):
     data,count = client.from_('date_table').select('date_id').eq('date', date).execute()
     return int(data[1][0].get("date_id"))
@@ -68,7 +63,7 @@ def format_temp(unformatted_temp):
     if (unformatted_temp == "--"):
         formatted_temp = None
     else:
-        # get rid of degree sign and cast to int
+        # Get rid of degree sign and cast to int
         formatted_temp = int(unformatted_temp[:-1])
     return formatted_temp
 

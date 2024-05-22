@@ -12,12 +12,7 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # 10 chosen location codes
 location_codes = {"USNY0002:1:US", "USFL0002:1:US", "USNJ0002:1:US", "USVT0002:1:US", "USMA0002:1:US", "USNH0002:1:US", "USVA0002:1:US", "USCA0002:1:US", "USCO0002:1:US", "USUT0002:1:US"}
 
-page = requests.get("https://weather.com/weather/today/l/USNY0002:1:US")
-soup = BeautifulSoup(page.content, "html.parser")
-# print(soup)
-
 def scrape_weather_data(client, location_code):
-    dict = {}
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
 
