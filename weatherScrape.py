@@ -41,13 +41,29 @@ def scrape_weather_data(client, location_code):
          # means location has already been added, ignore error
         pass
 
-    update_weather_table(client, date, location_code, high_temp, low_temp)
+    update_weather_table(client, date, location_code, format_temp(high_temp), format_temp(low_temp))
 
     # print extracted date, location, and high and low temp
     # print(f"Date: {date}")
     # print(f"Location: {location}")
     # print(f"High Temperature: {high_temp}")
     # print(f"Low Temperature: {low_temp}")
+
+# functions that update each table
+def update_weather_table(client, date, location_code, high_temp, low_temp):
+    date_id = get_date_id(client, date)
+    response = client.table('weather_table').insert({"date_id": date_id, "location_code": location_code, "high": high_temp, "low": low_temp}).execute()
+
+def update_location_table(client, location_code, location_name): 
+    data, count = client.table('location_table').insert({"location_id": location_code, "location_name": location_name}).execute()
+
+def update_date_table(client, date): 
+    data, count = client.table('date_table').insert({"date": date}).execute()
+
+# helper functions
+def get_date_id(client, date):
+    data,count = client.from_('date_table').select('date_id').eq('date', date).execute()
+    return int(data[1][0].get("date_id"))
 
 def format_temp(unformatted_temp):
     if (unformatted_temp == "--"):
@@ -57,22 +73,7 @@ def format_temp(unformatted_temp):
         formatted_temp = int(unformatted_temp[:-1])
     return formatted_temp
 
-def update_weather_table(client, date_id, location_code, high_temp, low_temp):
-    # data,count = client.from('date')
-    #     .select('date')
-    #     .eq(dict.get("date"))
-    #     .execute()
-    data, count = client.table('weather').insert({"date_id": date_id, "location_code": location_code, "high": high_temp, "low": low_temp}).execute()
-
-def update_location_table(client, location_code, location_name): 
-    data, count = supabase.table('location').insert({"id": dict.get("location_code"), "location_name": dict.get("location")}).execute()
-
-def update_date_table(client, date): 
-    data, count = supabase.table('date').insert({"date": dict.get("date")}).execute()
-    
-
 if __name__ == "__main__":
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    count = 0
     for location_code in location_codes:
-        scrape_weather_data(location_code)
+        scrape_weather_data(supabase, location_code)
