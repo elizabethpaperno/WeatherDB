@@ -11,6 +11,9 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # 10 chosen location codes
 location_codes = {"USNY0002:1:US", "USFL0002:1:US", "USNJ0002:1:US", "USVT0002:1:US", "USMA0002:1:US", "USNH0002:1:US", "USVA0002:1:US", "USCA0002:1:US", "USCO0002:1:US", "USUT0002:1:US"}
 
+def get_todays_date():
+    return datetime.now().strftime("%Y-%m-%d"); 
+
 def scrape_weather_data(client, location_code):
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
@@ -25,15 +28,7 @@ def scrape_weather_data(client, location_code):
     high_temp = temperatures[0].text
     low_temp = temperatures[1].text
 
-    location = soup.find('h1', {'class': 'CurrentConditions--location--1YWj_'}).text
-    
-    date = datetime.now().strftime("%Y-%m-%d")
-
-    try:
-        update_date_table(client, date)
-    except: 
-        # Means date has already been added, ignore error
-        pass  
+    location = soup.find('h1', {'class': 'CurrentConditions--location--1YWj_'}).text  
 
     try: 
         update_location_table(client, location_code, location)  
@@ -69,5 +64,7 @@ def format_temp(unformatted_temp):
 
 if __name__ == "__main__":
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    date = get_todays_date()
+    update_date_table(supabase, date)
     for location_code in location_codes:
         scrape_weather_data(supabase, location_code)
