@@ -19,8 +19,13 @@ def scrape_weather_data(client, location_code):
     dict = {}
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
-    wx_data_div = soup.find('div', {'data-testid': 'wxData', 'class': 'WeatherDetailsListItem--wxData--kK35q'})
-    temperatures = wx_data_div.find_all('span', {'data-testid': 'TemperatureValue'})
+
+    # Version 1: High temp tends to be null 
+    # wx_data_div = soup.find('div', {'data-testid': 'wxData', 'class': 'WeatherDetailsListItem--wxData--kK35q'})
+    # temperatures = wx_data_div.find_all('span', {'data-testid': 'TemperatureValue'})
+    
+    # Version 2: High temp does not tend to be null
+    temperatures = soup.find_all('span', {'data-testid': 'TemperatureValue'})
 
     high_temp = temperatures[0].text
     low_temp = temperatures[1].text
@@ -42,12 +47,6 @@ def scrape_weather_data(client, location_code):
         pass
 
     update_weather_table(client, date, location_code, format_temp(high_temp), format_temp(low_temp))
-
-    # print extracted date, location, and high and low temp
-    # print(f"Date: {date}")
-    # print(f"Location: {location}")
-    # print(f"High Temperature: {high_temp}")
-    # print(f"Low Temperature: {low_temp}")
 
 # functions that update each table
 def update_weather_table(client, date, location_code, high_temp, low_temp):
