@@ -12,6 +12,20 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 location_codes = []
 
 def scrape_weather_data_update_weather_table(client, date, location_code):
+    """
+    Populates the weather table with location code, date id and associated high and low temperaturs (obtained through web scraping). Intends to be run once daily.
+    
+    Parameters
+    -------
+    client: Client 
+        Connection to supabase database
+    date: string
+    location_code: string
+
+    Returns
+    -------
+    void
+    """
     page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
     soup = BeautifulSoup(page.content, "html.parser")
 
@@ -25,9 +39,23 @@ def scrape_weather_data_update_weather_table(client, date, location_code):
     high_temp = temperatures[0].text
     low_temp = temperatures[1].text  
 
-    update_weather_table(client, date, location_code, format_temp(high_temp), format_temp(low_temp))
+    update_weather_table(client, get_date_id(client, date), location_code, format_temp(high_temp), format_temp(low_temp))
 
 def init_location_table(client, location_codeslcl):
+    """
+    Populates the location table with location codes and associated location names (using web scraping). Intends to be run once ever.
+    
+    Parameters
+    -------
+    client: Client 
+        Connection to supabase database
+    location_codeslcl: list[string]
+        Chosen location codes to track weather data for
+
+    Returns
+    -------
+    void
+    """
     for location_code in location_codeslcl:
         page = requests.get(f"https://weather.com/weather/today/l/{location_code}")
         soup = BeautifulSoup(page.content, "html.parser")
@@ -36,6 +64,18 @@ def init_location_table(client, location_codeslcl):
         update_location_table(client, location_code, location)
 
 def populate_global_location_codes(client):
+    """
+    Populates the global variable ``location-codes`` with the valeus stored in the location table. 
+    
+    Parameters
+    -------
+    client: Client 
+        Connection to supabase database
+
+    Returns
+    -------
+    void
+    """
     data,count = client.from_('location_table').select('location_code').execute()
     for i in range(len(data[1])):
         print(data[1][i].get("location_code"))
@@ -43,7 +83,7 @@ def populate_global_location_codes(client):
     print(location_codes)
 
 # Functions that update each table
-def update_weather_table(client, date, location_code, high_temp, low_temp):
+def update_weather_table(client, date_id, location_code, high_temp, low_temp):
     """
     Insert row to weather table containing date_id, location_code, high_temp, and low_temp
 
@@ -64,7 +104,6 @@ def update_weather_table(client, date, location_code, high_temp, low_temp):
     -------
     void
     """
-    date_id = get_date_id(client, date)
     response = client.table('weather_table').insert({"date_id": date_id, "location_code": location_code, "high": high_temp, "low": low_temp}).execute()
 
 def update_location_table(client, location_code, location_name): 
