@@ -6,10 +6,10 @@ from supabase import create_client, Client
 from datetime import datetime
 
 
-SUPABASE_URL = "https://kdpfszinopwchmjvxdfl.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcGZzemlub3B3Y2htanZ4ZGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTYyNDM0OTgsImV4cCI6MjAzMTgxOTQ5OH0.H6fs_uUEeOHjscCpqwD3MSSvLeMvsfaO9vOlbo0EDsY"
+SUPABASE_URL = "" # fill in with url associated w supabase db
+SUPABASE_KEY = "" # fill in with key associated w supabase db
 
-# 10 chosen location codes
+# Stores chosen location codes
 location_codes = []
 
 def scrape_weather_data_update_weather_table(client, date, location_code):
@@ -189,6 +189,10 @@ def format_temp(unformatted_temp):
         # Get rid of degree sign and cast to int
         formatted_temp = int(unformatted_temp[:-1])
     return formatted_temp
+
+# Used for testing, ran once ever before cloud func is deployed
+def setup(client):
+    init_location_table(client, ["USNY0002:1:US", "USFL0002:1:US", "USNJ0002:1:US", "USVT0002:1:US", "USMA0002:1:US", "USNH0002:1:US", "USVA0002:1:US", "USCA0002:1:US", "USCO0002:1:US", "USUT0002:1:US"])
 
 #Ran daily
 @functions_framework.http

@@ -5,10 +5,10 @@ from supabase import create_client, Client
 from datetime import datetime
 
 
-SUPABASE_URL = "https://kdpfszinopwchmjvxdfl.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcGZzemlub3B3Y2htanZ4ZGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTYyNDM0OTgsImV4cCI6MjAzMTgxOTQ5OH0.H6fs_uUEeOHjscCpqwD3MSSvLeMvsfaO9vOlbo0EDsY"
+SUPABASE_URL = "" # fill in with url associated w supabase db
+SUPABASE_KEY = "" # fill in with key associated w supabase db
 
-# 10 chosen location codes
+# Stores chosen location codes
 location_codes = []
 
 def scrape_weather_data_update_weather_table(client, date, location_code):
