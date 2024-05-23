@@ -189,11 +189,11 @@ def format_temp(unformatted_temp):
         formatted_temp = int(unformatted_temp[:-1])
     return formatted_temp
 
-# Run once
+# Used for testing, run once before running main
 def setup(client):
     init_location_table(client, ["USNY0002:1:US", "USFL0002:1:US", "USNJ0002:1:US", "USVT0002:1:US", "USMA0002:1:US", "USNH0002:1:US", "USVA0002:1:US", "USCA0002:1:US", "USCO0002:1:US", "USUT0002:1:US"])
 
-# Ran daily
+# Scheduled to run daily
 if __name__ == "__main__":
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     date = get_todays_date()
